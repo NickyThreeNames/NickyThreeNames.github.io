@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>What Happened to the State House in 2014? - pt3 - PolitiNerd</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/mn_house_pt3.html">
+
+        <meta name="author" content="Nick Conti" />
+        <meta name="keywords" content="Tutorial,MNHouse,elections,Python" />
+        <meta name="description" content="More election statistics than you can shake a stick at. Part three in a series." />
+
+        <meta property="og:site_name" content="PolitiNerd" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="What Happened to the State House in 2014? - pt3"/>
+        <meta property="og:url" content="/mn_house_pt3.html"/>
+        <meta property="og:description" content="More election statistics than you can shake a stick at. Part three in a series."/>
+        <meta property="article:published_time" content="2016-06-22" />
+            <meta property="article:section" content="Blog" />
+            <meta property="article:tag" content="Tutorial" />
+            <meta property="article:tag" content="MNHouse" />
+            <meta property="article:tag" content="elections" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:author" content="Nick Conti" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+PolitiNerd            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about-me.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/course-list.html">
+                             Courses
+                          </a></li>
+                         <li><a href="/pages/portfolio.html">
+                             Portfolio
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/blog.html">Blog</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/mn_house_pt3.html"
+                       rel="bookmark"
+                       title="Permalink to What Happened to the State House in 2014? - pt3">
+                        What Happened to the State House in 2014? - pt3
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2016-06-22T08:49:00-05:00"> Wed 22 June 2016</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/tutorial.html">Tutorial</a>
+        /
+	<a href="/tag/mnhouse.html">MNHouse</a>
+        /
+	<a href="/tag/elections.html">elections</a>
+        /
+	<a href="/tag/python.html">Python</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h2><em>Minnesota 2014 State House Statistics - part 3</em></h2>
+<h3><em>More election statistics than you can shake a stick at</em></h3>
+<p>This is the third installment in examining the State House election results from 2014.  In this installment we will calculate  statistics about each district based on election returns.  In an earlier post, we pulled results for State House in 2014 at the State House level. For this project I will pull results from all state and federal races in Minnesota since 2012 at the precinct level.  For fellow campaign hacks, this will resemble stats you receive from <a href="http://ncec.org/">NCEC</a>.  The main focus will be on creating two metrics:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Desc.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Democratic Performance Index</td>
+<td>The  number/percent of votes the average democrat can expect in a district</td>
+</tr>
+<tr>
+<td>Democratic Base</td>
+<td>The minimum democratic vote in a district a democrat could expect to win</td>
+</tr>
+</tbody>
+</table>
+<p>Example notebooks <a href="https://github.com/NickyThreeNames/leafletR_elections">here</a> and <a href="https://github.com/NickyThreeNames/ElectionStatsandMap">here</a></p>
+<h3>Election Results</h3>
+<p>The first step is to download the precinct level results for each election and read them into a dataframe.  The <a href="http://www.sos.state.mn.us/">Secretary of State</a> has all of this data available online.  They do regularly update the site so be sure to double check links before following along.  FYI - Between when I did the initial analysis and wrote this post, they have updated the links to the spreadsheets.  The SOS regularly updates the website so double check links before using.</p>
+<div class="highlight"><pre><span></span><span class="n">url14</span> <span class="o">=</span> <span class="s1">&#39;http://www.sos.state.mn.us/media/1448/2014-general-federal-state-results-by-precinct-official.xlsx&#39;</span>
+<span class="n">e2014</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">url14</span><span class="p">)</span>
+<span class="n">e2014</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;2014&#39;</span>
+<span class="n">e2014</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">e2014</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<p>The above code uses the link to read the election results from Excel into a dataframe.  The last two lines of code give us the number of rows and a sample of the first five rows.  The code for 2012 is the same except for the download url.</p>
+<p>Unsurprisingly, there are a slightly different number of rows for each election.  The SOS's office combines precincts for reporting but occasionally varies which are combined each year.  For example, all of Apple Valley Ward 1 may be reported as one entry and in another year Apple Valley W1-P1 and W1-P2 are reported separately.  My goal is to eventually find a source that reports the same precincts every year, but I will save that for another time.  In the meantime, I will deal with the mismatch by aggregating to the State House District by year and then combine the results.  </p>
+<div class="highlight"><pre><span></span><span class="n">cols2014</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MNLEGDIST&#39;</span><span class="p">,</span> <span class="s1">&#39;TOTVOTING&#39;</span><span class="p">,</span> <span class="s1">&#39;USSENDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;USSENTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;USREPDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;USREPTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNLEGDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNLEGTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNGOVDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNGOVTOTAL&#39;</span><span class="p">,</span> 
+            <span class="s1">&#39;MNSOSDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNSOSTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAUDDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAUDTOTAL&#39;</span><span class="p">,</span><span class="s1">&#39;MNAGDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAGTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e2014</span> <span class="o">=</span> <span class="n">e2014</span><span class="p">[</span><span class="n">cols2014</span><span class="p">]</span>
+<span class="n">e14</span> <span class="o">=</span> <span class="n">e2014</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;MNLEGDIST&#39;</span><span class="p">,</span> <span class="n">as_index</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">e14</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<p>First I select the columns we want to aggregate.  Since the file has raw vote totals, I can pull the democratic candidate results and the total votes for each office.  The rest can be calculated from these totals.  The next step is to sum by district using the Pandas<a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.groupby.html">groupby</a> function.  We can simply repeat this process for 2012.</p>
+<p>Next, I go through and calculate the percentage of votes that each office (Governor, Senate, etc) received in each State House District.  The code used for the 2014 results is below:</p>
+<div class="highlight"><pre><span></span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USSENPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USSENDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USSENTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USREPPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USREPDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USREPTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNLEGPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNLEGDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNLEGTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNGOVPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNGOVDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNGOVTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNSOSPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNSOSDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNSOSTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAUDPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAUDDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAUDTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAGPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAGDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAGTOTAL&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<p>I create a new column for each of the offices and calculate the percentage of votes they received.  Now that I have the results, we can calculate the base democratic performance and the average democratic performance for each district.</p>
+<div class="highlight"><pre><span></span><span class="n">dfl_totals14</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;USSENDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;USREPDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNLEGDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNGOVDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNSOSDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAUDDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAGDFL&#39;</span><span class="p">]</span>
+<span class="n">dfl_percs14</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;USSENPERC&#39;</span><span class="p">,</span> <span class="s1">&#39;USREPPERC&#39;</span><span class="p">,</span> <span class="s1">&#39;MNLEGPERC&#39;</span><span class="p">,</span> <span class="s1">&#39;MNGOVPERC&#39;</span><span class="p">,</span> <span class="s1">&#39;MNSOSPERC&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAUDPERC&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAGPERC&#39;</span><span class="p">]</span>
+
+<span class="n">min1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="n">avg1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;DEMBASE_CNT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="n">dfl_totals14</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">min1</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;DEMBASE_PCT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="n">dfl_percs14</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">min1</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;DEMAV_CNT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="n">dfl_totals14</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">avg1</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;DEMAV_PCT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="n">dfl_percs14</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">avg1</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;2014&#39;</span>
+</pre></div>
+
+
+<p>The first thing we do is create lists for the totals and percentage columns that we use to then apply our lambda formulas.  "DEMBASE" finds the worst performing democratic candidate by row and appends to a new column.  "DEMAV" calculates the average performance for each row and appends to a new column.  The final line adds a column with the year for later use.  This process is repeated for 2012.</p>
+<p>Now I have two dataframes with the results columns, DPI, and Dem Base.  Next I append year to the name of all the columns.  This lets me reference the proper year once the data is merged together.</p>
+<div class="highlight"><pre><span></span><span class="n">df_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">e12</span><span class="p">,</span> <span class="n">e14</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df_list</span><span class="p">:</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+</pre></div>
+
+
+<p>The next step is to merge them together into one unwieldy spreadsheet.  Keeping it in a dataframe makes it much more manageable than trying to keep it all organized in Excel.</p>
+<div class="highlight"><pre><span></span><span class="n">emaster</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="n">e14</span><span class="p">,</span> <span class="n">left_on</span> <span class="o">=</span> <span class="s1">&#39;MNLEGDIST2012&#39;</span><span class="p">,</span> <span class="n">right_on</span> <span class="o">=</span> <span class="s1">&#39;MNLEGDIST2014&#39;</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+<span class="n">emaster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<p>This merges all of the dataframes into one huge dataframe called emaster (I really need to get better at naming these things) using an inner join based on district.  The second line of code prints out the total number of rows.  Now that the data is in one place, we can average across the years to get more robust estimate for the DPI and Dem Base.</p>
+<div class="highlight"><pre><span></span><span class="n">cols2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MNLEGDIST2014&#39;</span><span class="p">,</span> <span class="s1">&#39;DEMBASE_PCT2012&#39;</span><span class="p">,</span> <span class="s1">&#39;DEMBASE_PCT2014&#39;</span><span class="p">]</span>
+<span class="n">demBaseP</span> <span class="o">=</span> <span class="n">emaster</span><span class="p">[</span><span class="n">cols2</span><span class="p">]</span>
+
+<span class="n">demBase</span> <span class="o">=</span> <span class="n">demBaseP</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">numeric_only</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">demBase</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">demBase</span><span class="p">)</span>
+
+<span class="n">cols3</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MNLEGDIST2014&#39;</span><span class="p">,</span> <span class="s1">&#39;DEMAV_PCT2012&#39;</span><span class="p">,</span> <span class="s1">&#39;DEMAV_PCT2014&#39;</span><span class="p">]</span>
+<span class="n">demAvP</span> <span class="o">=</span> <span class="n">emaster</span><span class="p">[</span><span class="n">cols3</span><span class="p">]</span>
+<span class="n">dpi</span> <span class="o">=</span> <span class="n">demAvP</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">numeric_only</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">dpi</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dpi</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The above code filters down to the Dem Base and DPI columns before calculating an average for each of them in separate data frames.  Then I can use the code below to create a dataframe with only the district, DPI, and Dem Base.</p>
+<div class="highlight"><pre><span></span><span class="n">district_list</span> <span class="o">=</span> <span class="n">emaster</span><span class="p">[</span><span class="s1">&#39;MNLEGDIST2014&#39;</span><span class="p">]</span>
+
+<span class="n">stats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">district_list</span><span class="p">,</span> <span class="n">demBase</span><span class="p">,</span> <span class="n">dpi</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">stats</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="s1">&#39;DemBase&#39;</span><span class="p">,</span> <span class="s1">&#39;DPI&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<p>I can now join the "stats" dataframe to the original emaster dataframe for even more columns.</p>
+<div class="highlight"><pre><span></span><span class="n">to_merge</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MNLEGDIST2014&#39;</span><span class="p">,</span> <span class="s1">&#39;DEMBASE_CNT2014&#39;</span><span class="p">,</span> <span class="s1">&#39;DEMBASE_CNT2012&#39;</span><span class="p">,</span> <span class="s1">&#39;TOTVOTING2012&#39;</span><span class="p">]</span>
+
+<span class="n">districts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">emaster</span><span class="p">[</span><span class="n">to_merge</span><span class="p">],</span> <span class="n">left_on</span> <span class="o">=</span> <span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="n">right_on</span> <span class="o">=</span> <span class="s1">&#39;MNLEGDIST2014&#39;</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s2">&quot;inner&quot;</span><span class="p">)</span>
+<span class="n">districts</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<p>With everything joined back together again, we can calculate the Off-year dem base and use that to calculate the Drop-off Dem numbers.</p>
+<div class="highlight"><pre><span></span><span class="n">cols_for_final_stats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="s1">&#39;DPI&#39;</span><span class="p">,</span> <span class="s1">&#39;DemBase&#39;</span><span class="p">]</span>
+<span class="n">stateHouseStats</span> <span class="o">=</span> <span class="n">districts</span><span class="p">[</span><span class="n">cols_for_final_stats</span><span class="p">]</span>
+<span class="n">stateHouseStats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stateHouseStats</span><span class="p">)</span>
+<span class="n">stateHouseStats</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<p>I now have a dataframe with the District, DPI, Dem Base, Off-Year Base, and Drop-off Dems.  This can easily be combined wiht the data from our first post to get the State House results, Incumbency status, and current party.  Eat your heart out NCEC.</p>
+<p>That's plenty of code for one post. I will save the mapping portion for later.  Stay tuned for how to add this data to a map with interactive controls to select which data to show on the map.  <a href="https://bl.ocks.org/NickyThreeNames/553327998df38ddf56cc46c6d38713d8">Preview here</a> </p>
+<p><img alt="mninteractive" src="/images/leafletInteractive3.PNG"></p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'politinerd'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'mn_house_pt3';
+                var disqus_url = '/mn_house_pt3.html';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<div id="aboutme">
+        <p>
+            <img width="100%" class="img-thumbnail" src="/../images/me.png"/>
+        </p>
+    <p>
+      <strong>About Nick Conti</strong><br/>
+        
+I am a data analyst living in Minneapolis.
+<br></br>
+Though I work in banking now, I had my come-up working in political campaign data, beginning as a field organizer and eventually becoming a Statewide Data Director in Michigan.  I spent a lot of my time <del> fighting</del> working with Excel but became annoyed with its limitations as I focused more on data analysis.  Somewhere along the line, I was introduced to R, then Python, and the rest is history.  It was an instant nerd crush and I have been expanding my data programming skills since.  This blog is my valentine to the possibilities of what can be accomplished with data.
+<br></br>
+When not dealing with numbers, I can be found running, biking, and enjoying a beer on a patio.
+ 
+    </p>
+</div><!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a href="https://github.com/NickyThreeNames"><i class="fa fa-github-square fa-lg"></i> GitHub</a></li>
+    <li class="list-group-item"><a href="https://www.linkedin.com/in/nick-conti-6364475"><i class="fa fa-linkedin-square fa-lg"></i> LinkedIn</a></li>
+    <li class="list-group-item"><a href="https://twitter.com/nickythreenames"><i class="fa fa-twitter-square fa-lg"></i> Twitter</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Tag Cloud -->
+<li class="list-group-item">
+  <a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+  <ul class="list-group list-inline tagcloud" id="tags">
+    <li class="list-group-item tag-4">
+      <a href="/tag/about.html">About</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/api.html">api</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/class.html">Class</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/congress.html">Congress</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/election.html">Election</a>
+    </li>
+    <li class="list-group-item tag-2">
+      <a href="/tag/elections.html">elections</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/fec.html">FEC</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/folium.html">Folium</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/gis.html">GIS</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/machine-learning.html">machine learning</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/map.html">map</a>
+    </li>
+    <li class="list-group-item tag-2">
+      <a href="/tag/mnhouse.html">MNHouse</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/nlp.html">NLP</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/nltk.html">NLTK</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/python.html">python</a>
+    </li>
+    <li class="list-group-item tag-3">
+      <a href="/tag/r.html">R</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/review.html">Review</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/targeting.html">Targeting</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/tutorial.html">Tutorial</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/wordcloud.html">wordcloud</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Tag Cloud -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://getpelican.com" target="_blank">Pelican</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://fivethirtyeight.com" target="_blank">FiveThirtyEight</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://realpython.com" target="_blank">RealPython</a>
+    </li>
+    <li class="list-group-item">
+      <a href="https://www.yhat.com" target="_blank">Yhat</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://www.r-bloggers.com" target="_blank">R-bloggers</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container-fluid">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Nick Conti
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'politinerd'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Build an Interactive Election Explorer with Leaflet and R - PolitiNerd</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/interactive_election_R.html">
+
+        <meta name="author" content="Nick Conti" />
+        <meta name="keywords" content="Tutorial,MNHouse,elections,R,GIS" />
+        <meta name="description" content="Learn how to build an interactive election explorer in R." />
+
+        <meta property="og:site_name" content="PolitiNerd" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Build an Interactive Election Explorer with Leaflet and R"/>
+        <meta property="og:url" content="/interactive_election_R.html"/>
+        <meta property="og:description" content="Learn how to build an interactive election explorer in R."/>
+        <meta property="article:published_time" content="2016-06-28" />
+            <meta property="article:section" content="Blog" />
+            <meta property="article:tag" content="Tutorial" />
+            <meta property="article:tag" content="MNHouse" />
+            <meta property="article:tag" content="elections" />
+            <meta property="article:tag" content="R" />
+            <meta property="article:tag" content="GIS" />
+            <meta property="article:author" content="Nick Conti" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+PolitiNerd            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about-me.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/course-list.html">
+                             Courses
+                          </a></li>
+                         <li><a href="/pages/portfolio.html">
+                             Portfolio
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/blog.html">Blog</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/interactive_election_R.html"
+                       rel="bookmark"
+                       title="Permalink to Build an Interactive Election Explorer with Leaflet and R">
+                        Build an Interactive Election Explorer with Leaflet and R
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2016-06-28T07:55:00-05:00"> Tue 28 June 2016</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/tutorial.html">Tutorial</a>
+        /
+	<a href="/tag/mnhouse.html">MNHouse</a>
+        /
+	<a href="/tag/elections.html">elections</a>
+        /
+	<a href="/tag/r.html">R</a>
+        /
+	<a href="/tag/gis.html">GIS</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h1><em>Build an Election Results Explorer with Leaflet and R</em></h1>
+<h2><em>Now with more popups</em></h2>
+<h3>Overview</h3>
+<p>As I have said before, everybody loves seeing data on a map. Making those maps into an interactive app (with popups, layer selection, etc) can seem like sorcery to most people. Much like mice with cookies, making one data driven map begets more requests to create maps.  Rather than bury ourselves in individual maps, we can layer on additional information and make it interactive so users can decide what information to focus on.  Computerworld has a great tutorial that showed me the basics on map making and Leaflet layers <a href="http://www.computerworld.com/article/3038270/data-analytics/create-maps-in-r-in-10-fairly-easy-steps.html">here</a>. In this post, I will take the election statistics data from an earlier <a href="http://www.nickconti.io/mn_house_pt3.html">post</a> and put it on a map with popups and layers to allow us to explore election statistics for MN House Districts. A live preview is available <a href="https://bl.ocks.org/NickyThreeNames/raw/553327998df38ddf56cc46c6d38713d8/">here</a> and github repo is <a href="https://github.com/NickyThreeNames/leafletR_elections">here</a>.</p>
+<p><img alt="mninteractive" src="/images/leafletInteractive3.PNG"></p>
+<h3>System Setup</h3>
+<p>This tutorial will use <a href="https://www.r-project.org/about.html">R</a> and <a href="https://www.rstudio.com/">RStudio</a>. RStudio is a development environment for R and I highly recommend having installed before following along. We will be using a several R packages but mainly <a href="https://cran.r-project.org/web/packages/tmap/vignettes/tmap-nutshell.html">tmap</a>, <a href="https://rstudio.github.io/leaflet/">leafletr</a>, and <a href="http://www.htmlwidgets.org/">htmlwidget</a>. The leafletr package has a few additional features compared to <a href="https://folium.readthedocs.io/en/latest/">Folium</a> which I used earlier to link Leaflet with Python. Having RStudio will be especially helpful when using Leaflet because it will render the maps without needing a separate development server( or other weird workarounds). I developed the code for this tutorial using an R script but you could also use an R Markdown document or a <a href="http://jupyter.org/">Jupyter</a> notebook.</p>
+<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span><span class="s">&#39;tmap&#39;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span><span class="s">&#39;leaflet&#39;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span><span class="s">&#39;magrittr&#39;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span><span class="s">&#39;rio&#39;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span><span class="s">&#39;plyr&#39;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span><span class="s">&#39;scales&#39;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span><span class="s">&#39;htmlwidgets&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Get the map and data</h3>
+<p>Our next step is to import our election stats and then find a map of the state house districts. In the main project folder, I made a folder "data" for raw data. I copied a csv of our election statistics from earlier into that folder. Next, I used the <a href="https://cran.r-project.org/web/packages/rio/index.html">rio</a> package to read it into an R object.</p>
+<div class="highlight"><pre><span></span>datafile <span class="o">&lt;-</span> <span class="s">&quot;data/election.csv&quot;</span>
+election <span class="o">&lt;-</span> rio<span class="o">::</span>import<span class="p">(</span>datafile<span class="p">)</span>
+election<span class="o">$</span>Pickup <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>election<span class="o">$</span>Pickup<span class="p">)</span>
+str<span class="p">(</span>election<span class="p">)</span>
+</pre></div>
+
+
+<p>The first two lines read in the csv to the election dataframe. The third line transforms the "Pickup" column from text to a factor for easier mapping later. The final line displays a summary of column types in the dataframe. Next, I downloaded a map from Census Bureau's Cartographic Boundary <a href="https://www.census.gov/geo/maps-data/data/cbf/cbf_sld.html">page</a>. I extracted the zipfile into the data folder and then used tmap to read it into R using the code below.</p>
+<div class="highlight"><pre><span></span>mnshape <span class="o">&lt;-</span> <span class="s">&quot;data/cb_2015_27_sldl_500k.shp&quot;</span>
+mngeo2 <span class="o">&lt;-</span> read_shape<span class="p">(</span>file<span class="o">=</span>mnshape<span class="p">)</span>
+qtm<span class="p">(</span>mngeo2<span class="p">)</span>
+</pre></div>
+
+
+<p>The "qtm" command is a really convenient function from tmap to display a shapefile. I can also use that command later to quickly create static maps of the election data. Speaking of election data, let's add that to the shape file and create an initial map. This lets us see how the district name is formatted so we can format it to join with the dataframe.</p>
+<div class="highlight"><pre><span></span>str<span class="p">(</span>mngeo<span class="o">@</span>data<span class="o">$</span>NAME<span class="p">)</span>
+</pre></div>
+
+
+<p>Unfortunately the district names are stored as factors (aka categories) and their format does not quite match with the format in the dataframe. I will need to recode the dataframe to match district names like "1A" to "01A" and also change the map data names into a text field. The following code accomplishes both tasks.</p>
+<div class="highlight"><pre><span></span>election<span class="o">$</span>District <span class="o">&lt;-</span> revalue<span class="p">(</span>election<span class="o">$</span>District<span class="p">,</span>
+      <span class="kt">c</span><span class="p">(</span><span class="s">&quot;1A&quot;</span><span class="o">=</span><span class="s">&quot;01A&quot;</span><span class="p">,</span> <span class="s">&quot;1B&quot;</span><span class="o">=</span><span class="s">&quot;01B&quot;</span><span class="p">,</span><span class="s">&quot;2A&quot;</span><span class="o">=</span><span class="s">&quot;02A&quot;</span><span class="p">,</span> <span class="s">&quot;2B&quot;</span><span class="o">=</span> <span class="s">&quot;02B&quot;</span><span class="p">,</span> <span class="s">&quot;3A&quot;</span><span class="o">=</span><span class="s">&quot;03A&quot;</span><span class="p">,</span> <span class="s">&quot;3B&quot;</span><span class="o">=</span> <span class="s">&quot;03B&quot;</span><span class="p">,</span>
+        <span class="s">&quot;4A&quot;</span><span class="o">=</span><span class="s">&quot;04A&quot;</span><span class="p">,</span> <span class="s">&quot;4B&quot;</span><span class="o">=</span><span class="s">&quot;04B&quot;</span><span class="p">,</span> <span class="s">&quot;5A&quot;</span><span class="o">=</span><span class="s">&quot;05A&quot;</span><span class="p">,</span> <span class="s">&quot;5B&quot;</span><span class="o">=</span><span class="s">&quot;05B&quot;</span><span class="p">,</span> <span class="s">&quot;6A&quot;</span><span class="o">=</span><span class="s">&quot;06A&quot;</span><span class="p">,</span> <span class="s">&quot;6B&quot;</span><span class="o">=</span><span class="s">&quot;06B&quot;</span><span class="p">,</span>
+        <span class="s">&quot;7A&quot;</span><span class="o">=</span><span class="s">&quot;07A&quot;</span><span class="p">,</span> <span class="s">&quot;7B&quot;</span><span class="o">=</span><span class="s">&quot;07B&quot;</span><span class="p">,</span> <span class="s">&quot;8A&quot;</span><span class="o">=</span><span class="s">&quot;08A&quot;</span><span class="p">,</span> <span class="s">&quot;8B&quot;</span><span class="o">=</span><span class="s">&quot;08B&quot;</span><span class="p">,</span> <span class="s">&quot;9A&quot;</span><span class="o">=</span><span class="s">&quot;09A&quot;</span><span class="p">,</span> <span class="s">&quot;9B&quot;</span><span class="o">=</span><span class="s">&quot;09B&quot;</span><span class="p">))</span>
+
+mngeo<span class="o">@</span>data<span class="o">$</span>DISTRICT <span class="o">&lt;-</span> <span class="kp">as.character</span><span class="p">(</span>mngeo<span class="o">@</span>data<span class="o">$</span>NAME<span class="p">)</span>
+</pre></div>
+
+
+<p>Now that the data is wrangled, it can be joined to the maps. This is usually the toughest part of mapping. Luckily, tmap has another helper function to make this process much easier.</p>
+<div class="highlight"><pre><span></span>mnmap <span class="o">&lt;-</span> append_data<span class="p">(</span>mngeo<span class="p">,</span> election<span class="p">,</span> key.shp <span class="o">=</span> <span class="s">&quot;NAME&quot;</span><span class="p">,</span> key.data<span class="o">=</span><span class="s">&quot;District&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The append_data() function takes the shapefile ("mngeo") and the dataframe ("election") along with which keys to use to join the files together. Since I took care of the reformatting and recoding earlier, the files match up. Now that the shapefile is complete, it is time to make some maps.</p>
+<h3>Maps!</h3>
+<p>As with most data projects, a bulk of the work was in finding and wrangling the data. With that step out of the way, we can make some maps. Again, tmap comes to the rescue with the qtm() function which creates a choropleth map quickly.</p>
+<div class="highlight"><pre><span></span>qtm<span class="p">(</span>mnmap<span class="p">,</span> <span class="s">&quot;DemBase&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="qtmMap" src="/images/tmapMN.png"></p>
+<p>The above code snippet created the  choropleth map using the values from "DemBase" in the combined shapefile. The qtm function can be a really useful way to quickly create static maps while exploring data. The qtm function has a lot of tools and customization options. Check out the tmap <a href="">documentation</a>.</p>
+<h3>Leaflet Maps</h3>
+<p>The part we've all been waiting for, making interactive maps with leaflet.  With the additional functionality of Leaflet comes a litle bit more work.  The first step will be to get the palette ready and then add the popups.  Once we have these pieces, we can combine them into our map.</p>
+<div class="highlight"><pre><span></span>minPct <span class="o">&lt;-</span> <span class="kp">min</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>MNGOVPERC2014<span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>DPI<span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>DemBase<span class="p">))</span>
+maxPct <span class="o">&lt;-</span> <span class="kp">max</span><span class="p">(</span><span class="kt">c</span><span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>MNGOVPERC2014<span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>DPI<span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>DemBase<span class="p">))</span>
+paletteLayers <span class="o">&lt;-</span> colorBin<span class="p">(</span>palette <span class="o">=</span> <span class="s">&quot;RdBu&quot;</span><span class="p">,</span> domain <span class="o">=</span> <span class="kt">c</span><span class="p">(</span>minPct<span class="p">,</span> maxPct<span class="p">),</span> bins <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">.4</span><span class="p">,</span> <span class="m">.45</span><span class="p">,</span> <span class="m">.5</span><span class="p">,</span> <span class="m">.55</span><span class="p">,</span> <span class="m">.6</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span> <span class="p">,</span> pretty<span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span>
+</pre></div>
+
+
+<p>I have taken a different approach to this palette in order to use it for multiple metrics.  First I took the minimum and maximum values across all of the fields I will map and then used them to set the range for the palette.  In the last line, I also added the bins that I wanted to see different breaks at.  The "pretty = FALSE" call is to ensure it uses the actual ranges rather than allowing Leaflet to adjust the ranges to have even coverage.</p>
+<p>Next up is setting the popups.  The below code sets up the popups that will appear whenever you click on a district.</p>
+<div class="highlight"><pre><span></span>mnpopup <span class="o">&lt;-</span> <span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span><span class="s">&quot;District: &quot;</span><span class="p">,</span><span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>DISTRICT<span class="p">,</span> <span class="s">&quot;&lt;br&gt;&quot;</span><span class="p">,</span>
+              <span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;Representative: &quot;</span><span class="p">,</span> <span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>Name<span class="p">,</span> <span class="s">&quot;&lt;br&gt;&quot;</span><span class="p">,</span>
+              <span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;Party: &quot;</span><span class="p">,</span> <span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>Party<span class="p">,</span> <span class="s">&quot;&lt;br&gt;&quot;</span><span class="p">,</span>
+              <span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span><span class="s">&quot;DFL House 2014: &quot;</span><span class="p">,</span><span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> percent<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">),</span> <span class="s">&quot;&lt;br&gt;&quot;</span><span class="p">,</span>
+              <span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;Pickup: &quot;</span><span class="p">,</span> <span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> mnmap<span class="o">@</span>data<span class="o">$</span>Pickup<span class="p">,</span> <span class="s">&quot;&lt;br&gt;&quot;</span><span class="p">,</span>
+              <span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span><span class="s">&quot;DPI: &quot;</span><span class="p">,</span><span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> percent<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>DPI<span class="p">),</span> <span class="s">&quot;&lt;br&gt;&quot;</span><span class="p">,</span>
+              <span class="s">&quot;&lt;b&gt;&quot;</span><span class="p">,</span><span class="s">&quot;Dem Base: &quot;</span><span class="p">,</span><span class="s">&quot;&lt;/b&gt;&quot;</span><span class="p">,</span> percent<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>DemBase<span class="p">))</span>
+</pre></div>
+
+
+<p>The Leaflet package understands raw HTML so I use paste0() to string together heading as a text field and then call the data directly as in the first line.  "mnmap@data$District" directly access the data for the selected district from that field in the shapefile.  Also, Leaflet will render the html tags I have added to bold the heading names and "<br>" to add a line break.  I found that my popups behaved unpredictably without the linebreaks, but they may not be necessary.  Additionally, I make use of the scales package with the percent() function.  This converts decimals into a more readable format.</p>
+<p>With everything set up, I will actually make a couple of maps.  First I will create a single-layer map that is automatically rendered in RStudio.  The second example will be a multi-layered map where you can select what data is displayed in the map.  That map will be created as an object that can be exported to HTML for use on any website.  The code for the first map is below.</p>
+<div class="highlight"><pre><span></span>leaflet<span class="p">(</span>mngeo<span class="p">)</span> <span class="o">%&gt;%</span>
+addProviderTiles<span class="p">(</span><span class="s">&quot;CartoDB.Positron&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> 
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span>
+          weight <span class="o">=</span> <span class="m">1</span><span class="p">,</span>
+          fillOpacity <span class="o">=</span> <span class="m">.6</span><span class="p">,</span> 
+          popup<span class="o">=</span>mnpopup<span class="p">,</span>
+          color<span class="o">=</span> <span class="o">~</span>mnPalette<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">)</span>
+          <span class="p">)</span><span class="o">%&gt;%</span> addLegend<span class="p">(</span><span class="s">&quot;bottomright&quot;</span><span class="p">,</span> pal <span class="o">=</span> mnPalette<span class="p">,</span> values <span class="o">=</span> <span class="o">~</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">,</span> title <span class="o">=</span> <span class="s">&quot;Results %&quot;</span><span class="p">,</span>
+                         labFormat <span class="o">=</span> labelFormat<span class="p">(</span>suffix <span class="o">=</span> <span class="s">&#39;%&#39;</span><span class="p">,</span> between <span class="o">=</span> <span class="s">&#39;% - &#39;</span><span class="p">,</span>
+                                                 transform <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="m">100</span> <span class="o">*</span> x<span class="p">))</span>
+</pre></div>
+
+
+<p>There is a lot of code here, but it follows a pretty straightforward pattern.  The first line, "leaflet(mngeo) %&gt;% " calls leaflet and tells it to use our mngeo shapefile.  The "%&gt;%" is a pipe operator (from the magrittr package) that sends the shape file info to the rest of the code.  Provider tiles are the maps that are underneath the choropleth later, I used "CartoDB.Positron" but there are a lot of other options  you could use (learn more <a href="">here</a>).  The next three lines cover aesthetic choices about how shapes are drawn and you can find the details <a href="">here</a>. I found the values through trial and error, but seem to be very versatile.  Next, I assign the popup info from earlier and then assign the color palette from before.  The addLegend()) does what the name says, but the labFormat() function can be trickier.  This function has a lot of options for how to display the numbers in the legend.  This code appends "%" to end of the line (behind the last number), and puts "% - " in between each of the numbers. The final line in labelFormat() converts the decimals to display as regular numbers.  The end result is shown in the snapshot below.</p>
+<p><img alt="leafletMN" src="/images/mnLegLeaflet2.PNG"></p>
+<p>Finally, I will create a multi-layer map with popups where you can select what data is being displayed (hence the multiple layers). The basic structure will be to create a leaflet object with the shapefile and then add polygon layers to that object (one for each of the stats we want to be able to view) and finally add controls to select the layers.  It sounds clunky, but is actually pretty straightforward once you see the code.  Since we already have the palette layer and popups ready, I just need to create one new palette and then build the map.</p>
+<div class="highlight"><pre><span></span>incumbPalette <span class="o">&lt;-</span> colorFactor<span class="p">(</span>palette <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;blue&quot;</span><span class="p">,</span> <span class="s">&quot;grey&quot;</span><span class="p">,</span> <span class="s">&quot;red&quot;</span><span class="p">),</span> domain <span class="o">=</span> mnmap<span class="o">@</span>data<span class="o">$</span>Pickup<span class="p">)</span>
+</pre></div>
+
+
+<p>The "Pickup" column in the election data tells us whether the seat was one by an incumbent, Republican, or DLF'er.  The above code sets the color based on categorical information.  Through trial and error, I found the order of the colors does matter.  With that palette ready, let's build the initial object and one layer of the map.</p>
+<div class="highlight"><pre><span></span>mnResultmap <span class="o">&lt;-</span> leaflet<span class="p">(</span>mngeo2<span class="p">)</span> <span class="o">%&gt;%</span> 
+  addProviderTiles<span class="p">(</span><span class="s">&quot;CartoDB.Positron&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
+          weight<span class="o">=</span><span class="m">1</span><span class="p">,</span>
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span>
+          fillOpacity <span class="o">=</span> <span class="m">.75</span><span class="p">,</span>
+          popup<span class="o">=</span>mnpopup<span class="p">,</span> 
+          color<span class="o">=</span> <span class="o">~</span>incumbPalette<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>Pickup<span class="p">),</span>
+          group<span class="o">=</span><span class="s">&quot;Pickup&quot;</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span> 
+  addLegend<span class="p">(</span>position<span class="o">=</span><span class="s">&quot;bottomleft&quot;</span><span class="p">,</span> colors<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="s">&#39;grey&#39;</span><span class="p">,</span> <span class="s">&#39;red&#39;</span><span class="p">),</span> labels<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;Dem&quot;</span><span class="p">,</span> <span class="s">&quot;Incumbent&quot;</span><span class="p">,</span> <span class="s">&quot;Repub&quot;</span><span class="p">))</span>
+</pre></div>
+
+
+<p>With that first layer, I used essentially the same code as when creating the standalone leaflet map earlier.  To get the multiple layers, I will add "%&gt;%" to chain it to the next layer on the map.  After the last layer, I will add a call to the layer controls.  After that, I just need to type the object name, "mnResultmap" and RStudio will serve a local version of the website.  The full code for the map is below.</p>
+<div class="highlight"><pre><span></span>mnResultmap <span class="o">&lt;-</span> leaflet<span class="p">(</span>mngeo2<span class="p">)</span> <span class="o">%&gt;%</span> 
+  addProviderTiles<span class="p">(</span><span class="s">&quot;CartoDB.Positron&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
+          weight<span class="o">=</span><span class="m">1</span><span class="p">,</span>
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span>
+          fillOpacity <span class="o">=</span> <span class="m">.75</span><span class="p">,</span>
+          popup<span class="o">=</span>mnpopup<span class="p">,</span> 
+          color<span class="o">=</span> <span class="o">~</span>incumbPalette<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>Pickup<span class="p">),</span>
+          group<span class="o">=</span><span class="s">&quot;Pickup&quot;</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span> 
+  addLegend<span class="p">(</span>position<span class="o">=</span><span class="s">&quot;bottomleft&quot;</span><span class="p">,</span> colors<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="s">&#39;grey&#39;</span><span class="p">,</span> <span class="s">&#39;red&#39;</span><span class="p">),</span> labels<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;Dem&quot;</span><span class="p">,</span> <span class="s">&quot;Incumbent&quot;</span><span class="p">,</span> <span class="s">&quot;Repub&quot;</span><span class="p">))</span>  <span class="o">%&gt;%</span>
+
+  addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
+          weight<span class="o">=</span><span class="m">1</span><span class="p">,</span>
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span> 
+          fillOpacity <span class="o">=</span> <span class="m">.75</span><span class="p">,</span> 
+          popup<span class="o">=</span>mnpopup<span class="p">,</span> 
+          color<span class="o">=</span> <span class="o">~</span>paletteLayers<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">),</span>
+          group<span class="o">=</span><span class="s">&quot;DFL House 2014&quot;</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span> addLegend<span class="p">(</span><span class="s">&quot;bottomright&quot;</span><span class="p">,</span> pal <span class="o">=</span> paletteLayers<span class="p">,</span> values <span class="o">=</span> <span class="o">~</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNLEGPERC2014<span class="p">,</span> title <span class="o">=</span> <span class="s">&quot;Results&quot;</span><span class="p">,</span>
+              labFormat <span class="o">=</span> labelFormat<span class="p">(</span>suffix <span class="o">=</span> <span class="s">&#39;%&#39;</span><span class="p">,</span> between <span class="o">=</span> <span class="s">&#39;%-&#39;</span><span class="p">,</span>
+                                      transform <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="m">100</span> <span class="o">*</span> x<span class="p">))</span> <span class="o">%&gt;%</span>
+
+  addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
+          weight<span class="o">=</span><span class="m">1</span><span class="p">,</span>
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span> 
+          fillOpacity <span class="o">=</span> <span class="m">.75</span><span class="p">,</span> 
+          popup<span class="o">=</span>mnpopup<span class="p">,</span> 
+          color<span class="o">=</span> <span class="o">~</span>paletteLayers<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>DPI<span class="p">),</span>
+          group<span class="o">=</span><span class="s">&quot;DPI&quot;</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+
+  addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
+          weight<span class="o">=</span><span class="m">1</span><span class="p">,</span>
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span> 
+          fillOpacity <span class="o">=</span> <span class="m">.75</span><span class="p">,</span> 
+          popup<span class="o">=</span>mnpopup<span class="p">,</span> 
+          color<span class="o">=</span> <span class="o">~</span>paletteLayers<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>DemBase<span class="p">),</span>
+          group<span class="o">=</span><span class="s">&quot;Democratic Base&quot;</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+
+  addPolygons<span class="p">(</span>stroke<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>
+          weight<span class="o">=</span><span class="m">1</span><span class="p">,</span>
+          smoothFactor <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span> 
+          fillOpacity <span class="o">=</span> <span class="m">.75</span><span class="p">,</span> 
+          popup<span class="o">=</span>mnpopup<span class="p">,</span> 
+          color<span class="o">=</span> <span class="o">~</span>paletteLayers<span class="p">(</span>mnmap<span class="o">@</span>data<span class="o">$</span>MNGOVPERC2014<span class="p">),</span>
+          group<span class="o">=</span><span class="s">&quot;Governor&quot;</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>
+
+  addLayersControl<span class="p">(</span>
+    baseGroups<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;Pickup&quot;</span><span class="p">,</span> <span class="s">&quot;DFL House 2014&quot;</span><span class="p">,</span> <span class="s">&quot;DPI&quot;</span><span class="p">,</span> <span class="s">&quot;Democratic Base&quot;</span><span class="p">,</span> <span class="s">&quot;Governor&quot;</span><span class="p">),</span>
+    position <span class="o">=</span> <span class="s">&quot;bottomleft&quot;</span><span class="p">,</span>
+    options <span class="o">=</span> layersControlOptions<span class="p">(</span>collapsed <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+  <span class="p">)</span>
+
+mnResultmap
+</pre></div>
+
+
+<p>Interactive version <a href="https://bl.ocks.org/NickyThreeNames/raw/553327998df38ddf56cc46c6d38713d8/">here</a></p>
+<p><img alt="mninteractive" src="/images/leafletInteractive3.PNG"></p>
+<p>Now that I have the map working locally, I can export it with the htmlwidgets package.</p>
+<div class="highlight"><pre><span></span>saveWidget<span class="p">(</span>mnResultmap<span class="p">,</span> file<span class="o">=</span><span class="s">&quot;index.html&quot;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This creates a single HTML file for use on any server (or in a Github Gist).  Be warned, the HTML file is big and includes all of the data for the shape file and csv inline.  This can make it really hard to modify the HTML, but it does work without any modification.  Alternately, you can use RMarkdown and follow the instructions on this Stack Overflow <a href="http://stackoverflow.com/questions/30110377/saving-leaflet-output-as-html">post</a>.</p>
+<p>Having an interactive map can be a great tool for understanding complex data like this.  Enjoy!</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'politinerd'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'interactive_election_R';
+                var disqus_url = '/interactive_election_R.html';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<div id="aboutme">
+        <p>
+            <img width="100%" class="img-thumbnail" src="/../images/me.png"/>
+        </p>
+    <p>
+      <strong>About Nick Conti</strong><br/>
+        
+I am a data analyst living in Minneapolis.
+<br></br>
+Though I work in banking now, I had my come-up working in political campaign data, beginning as a field organizer and eventually becoming a Statewide Data Director in Michigan.  I spent a lot of my time <del> fighting</del> working with Excel but became annoyed with its limitations as I focused more on data analysis.  Somewhere along the line, I was introduced to R, then Python, and the rest is history.  It was an instant nerd crush and I have been expanding my data programming skills since.  This blog is my valentine to the possibilities of what can be accomplished with data.
+<br></br>
+When not dealing with numbers, I can be found running, biking, and enjoying a beer on a patio.
+ 
+    </p>
+</div><!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a href="https://github.com/NickyThreeNames"><i class="fa fa-github-square fa-lg"></i> GitHub</a></li>
+    <li class="list-group-item"><a href="https://www.linkedin.com/in/nick-conti-6364475"><i class="fa fa-linkedin-square fa-lg"></i> LinkedIn</a></li>
+    <li class="list-group-item"><a href="https://twitter.com/nickythreenames"><i class="fa fa-twitter-square fa-lg"></i> Twitter</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Tag Cloud -->
+<li class="list-group-item">
+  <a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+  <ul class="list-group list-inline tagcloud" id="tags">
+    <li class="list-group-item tag-4">
+      <a href="/tag/about.html">About</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/api.html">api</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/class.html">Class</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/congress.html">Congress</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/election.html">Election</a>
+    </li>
+    <li class="list-group-item tag-2">
+      <a href="/tag/elections.html">elections</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/fec.html">FEC</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/folium.html">Folium</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/gis.html">GIS</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/machine-learning.html">machine learning</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/map.html">map</a>
+    </li>
+    <li class="list-group-item tag-2">
+      <a href="/tag/mnhouse.html">MNHouse</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/nlp.html">NLP</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/nltk.html">NLTK</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/python.html">python</a>
+    </li>
+    <li class="list-group-item tag-3">
+      <a href="/tag/r.html">R</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/review.html">Review</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/targeting.html">Targeting</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/tutorial.html">Tutorial</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/wordcloud.html">wordcloud</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Tag Cloud -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://getpelican.com" target="_blank">Pelican</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://fivethirtyeight.com" target="_blank">FiveThirtyEight</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://realpython.com" target="_blank">RealPython</a>
+    </li>
+    <li class="list-group-item">
+      <a href="https://www.yhat.com" target="_blank">Yhat</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://www.r-bloggers.com" target="_blank">R-bloggers</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container-fluid">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Nick Conti
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'politinerd'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+
+</body>
+</html>

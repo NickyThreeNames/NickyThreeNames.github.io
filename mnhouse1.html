@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>What Happened to the State House in 2014? - pt1 - PolitiNerd</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/mnhouse1.html">
+
+        <meta name="author" content="Nick Conti" />
+        <meta name="keywords" content="Tutorial,MNHouse,Python" />
+        <meta name="description" content="Part 1 in series examining MN State House 2014 election results." />
+
+        <meta property="og:site_name" content="PolitiNerd" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="What Happened to the State House in 2014? - pt1"/>
+        <meta property="og:url" content="/mnhouse1.html"/>
+        <meta property="og:description" content="Part 1 in series examining MN State House 2014 election results."/>
+        <meta property="article:published_time" content="2016-05-09" />
+            <meta property="article:section" content="Blog" />
+            <meta property="article:tag" content="Tutorial" />
+            <meta property="article:tag" content="MNHouse" />
+            <meta property="article:tag" content="Python" />
+            <meta property="article:author" content="Nick Conti" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+
+
+
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+PolitiNerd            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about-me.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/course-list.html">
+                             Courses
+                          </a></li>
+                         <li><a href="/pages/portfolio.html">
+                             Portfolio
+                          </a></li>
+                         <li><a href="/pages/resume.html">
+                             Resume
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/blog.html">Blog</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/mnhouse1.html"
+                       rel="bookmark"
+                       title="Permalink to What Happened to the State House in 2014? - pt1">
+                        What Happened to the State House in 2014? - pt1
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2016-05-09T21:49:00-05:00"> Mon 09 May 2016</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/tutorial.html">Tutorial</a>
+        /
+	<a href="/tag/mnhouse.html">MNHouse</a>
+        /
+	<a href="/tag/python.html">Python</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <h1><em>Minnesota 2014 State House Results</em></h1>
+<h3>Overview</h3>
+<p>This will be a multi-part post looking at what happened to the DFL candidates for State House in 2014.  It will be focused on the numbers rather than message or issues, mainly because I have more access to the numbers.  In later parts I will create more metrics (such as democratic base and DPI) and visualize the results with maps.  When I was working on this, I used a few Jupyter notebooks that are available <a href="www.github.com/NickyThreeNames">here</a>.  Fair warning, they are pretty disorganized but do show all of the steps (albeit out of order).</p>
+<h3>2014 Results</h3>
+<p>In this post I am going to gather election results data from the <a href="http://www.sos.state.mn.us">Minnesota Secretary of State</a> and <a href="http://www.wikipedia.com">Wikipedia</a>.</p>
+<p>Let's start with results from the most recent general election, 2014.  The following Python code will initialize needed packages and put the results into a <a href="http://pandas.pydata.org/index.html" title="Pandas Documentation">Pandas</a> dataframe made from the excel file.  </p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">url14</span> <span class="o">=</span> <span class="s1">&#39;http://www.sos.state.mn.us/Modules/ShowDocument.aspx?documentid=14542&#39;</span>
+<span class="n">e2014</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">url14</span><span class="p">)</span>
+<span class="n">e2014</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;2014&#39;</span>
+<span class="n">e2014</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<p>The last command gives the number of rows in the data as a quick check that everything downloaded correctly.  I have also added a column for year and set it to 2014.  </p>
+<p>The data returned is at precinct level, and is pretty messy.  First I'll rename the columns.</p>
+<div class="highlight"><pre><span></span><span class="n">cols2014</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MNLEGDIST&#39;</span><span class="p">,</span> <span class="s1">&#39;TOTVOTING&#39;</span><span class="p">,</span> <span class="s1">&#39;USSENDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;USSENTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;USREPDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;USREPTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNLEGDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNLEGTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNGOVDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNGOVTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNSOSDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNSOSTOTAL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAUDDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAUDTOTAL&#39;</span><span class="p">,</span><span class="s1">&#39;MNAGDFL&#39;</span><span class="p">,</span> <span class="s1">&#39;MNAGTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e2014</span> <span class="o">=</span> <span class="n">e2014</span><span class="p">[</span><span class="n">cols2014</span><span class="p">]</span>
+</pre></div>
+
+
+<p>Next I will aggregate the data to the State House level and take a look at our data.</p>
+<div class="highlight"><pre><span></span><span class="n">e14</span> <span class="o">=</span> <span class="n">e2014</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;MNLEGDIST&#39;</span><span class="p">,</span> <span class="n">as_index</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">e14</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<p>The Secretary of State only has raw vote totals, but this not how I usually look at election results.  The following code creates  percentages for the DFL candidates as new columns in the dataframe. (I'll come back later and filter down to the just the State House candidates.)</p>
+<div class="highlight"><pre><span></span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USSENPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USSENDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USSENTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USREPPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USREPDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;USREPTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNLEGPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNLEGDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNLEGTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNGOVPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNGOVDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNGOVTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNSOSPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNSOSDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNSOSTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAUDPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAUDDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAUDTOTAL&#39;</span><span class="p">]</span>
+<span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAGPERC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAGDFL&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">e14</span><span class="p">[</span><span class="s1">&#39;MNAGTOTAL&#39;</span><span class="p">]</span>
+
+<span class="n">stateHouseStats2016</span> <span class="o">=</span> <span class="n">e14</span>
+</pre></div>
+
+
+<h3>Candidate information</h3>
+<p>I also want to see which representatives are incumbents.  Luckily, Wikipedia has legislator data for the Minnesota House complete with a table of when they were elected <a href="https://en.wikipedia.org/wiki/Minnesota_House_of_Representatives">here</a>.  The following code loads the libraries and starts the webscrape using <a href="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a>.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://en.wikipedia.org/wiki/Minnesota_House_of_Representatives&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">())</span>
+</pre></div>
+
+
+<p>The last line in the code prints out the text from the website and can be used to figure out the rest of the scraper (optional step).  After reviewing the output, I am interested in the table that includes when they were first elected.  Let's select that table and initialize some Python lists to put the data into:</p>
+<div class="highlight"><pre><span></span><span class="n">legis_tbl</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">class_</span> <span class="o">=</span> <span class="s2">&quot;wikitable sortable&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">legis_tbl</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The above code prints out all of the lines in the table(s) that have the class "wikitable sortable".  Let's select that table and initialize some Python lists to put the data into:</p>
+<div class="highlight"><pre><span></span><span class="n">district</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">party</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">elected</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+
+
+<p>The next step is to parse that table and append the data to the lists. There are a few legislators who have served non-consecutive terms and have multiple dates in their "Elected" column.  The sample code grabs the most recent date, which is fine for my purposes.  They will <em>not</em> be considered incumbents if their most recent win was in 2014.</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">legis_tbl</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">&#39;tr&#39;</span><span class="p">):</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">&#39;td&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">district</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="n">name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="n">party</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="n">elected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Next I will add them to a Pandas data frame with the following code.</p>
+<div class="highlight"><pre><span></span><span class="n">legislator_info</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">district</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;District&#39;</span><span class="p">])</span>
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;District&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">district</span>
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;Party&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">party</span>
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;Elected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">elected</span>
+<span class="n">legislator_info</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Now that the data is in a data frame, I have some more cleanup to do.  First I'll remove extraneous punctuation and then convert the year column to an integer.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">remove_punctuation</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)])</span>
+<span class="k">return</span> <span class="n">s</span>
+
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;FirstElected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;Elected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">remove_punctuation</span><span class="p">)</span>
+</pre></div>
+
+
+<p>While I am cleaning up data, let's add a column to show if they were DFL or Republican pickup (as opposed to a incumbent retaining their seat).  I will use two functions to accomplish this. The first one will see if the candidate is newly elected and the second one codes them based on party affiliation.  The second function assigns them a numeric code I can use later to visualize the data.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">newly_elected</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;YearElected&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2014</span> <span class="ow">or</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;YearElected&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2015</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;Party&#39;</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s1">&#39;Incumbent&#39;</span>
+
+<span class="k">def</span> <span class="nf">new_elected_code</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;Pickup&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Republican&#39;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mi">0</span>
+<span class="k">elif</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;Pickup&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Incumbent&#39;</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mi">1</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="mi">2</span>
+
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;Pickup&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">legislator_info</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">newly_elected</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">legislator_info</span><span class="p">[</span><span class="s1">&#39;Pickup_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">legislator_info</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">new_elected_code</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Let's trim it down to just columns I want to use later</p>
+<div class="highlight"><pre><span></span><span class="n">to_keep</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;Party&#39;</span><span class="p">,</span> <span class="s1">&#39;Pickup&#39;</span><span class="p">,</span> <span class="s1">&#39;Pickup_code&#39;</span><span class="p">,</span> <span class="s1">&#39;YearElected&#39;</span><span class="p">]</span>
+<span class="n">legislators</span> <span class="o">=</span> <span class="n">legislator_info</span><span class="p">[</span><span class="n">to_keep</span><span class="p">]</span>
+</pre></div>
+
+
+<p>Next I merge it with the data from earlier.  (If you are looking at the notebook in github, there are a couple of extra fields in the example that I will cover in a later blog post.)</p>
+<div class="highlight"><pre><span></span><span class="n">stateHouseStats2016</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">stateHouseStats</span><span class="p">,</span> <span class="n">legislators</span><span class="p">,</span> <span class="n">left_on</span> <span class="o">=</span> <span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="n">right_on</span> <span class="o">=</span> <span class="s1">&#39;District&#39;</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>At this point I have clean data for further analysis. If I was doing this as part of a campaign, I would either dump it to a SQL database or an Excel spreadsheet (depending on the campaign).  Since I will use this data to create some maps in a future post, I will write it out to a csv.</p>
+<p>Thanks for reading the first tutorial!</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'politinerd'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'mnhouse1';
+                var disqus_url = '/mnhouse1.html';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<div id="aboutme">
+        <p>
+            <img width="100%" class="img-thumbnail" src="/../images/me.png"/>
+        </p>
+    <p>
+      <strong>About Nick Conti</strong><br/>
+        
+I am a data analyst living in Minneapolis.
+<br></br>
+Though I work in banking now, I had my come-up working in political campaign data, beginning as a field organizer and eventually becoming a Statewide Data Director in Michigan.  I spent a lot of my time <del> fighting</del> working with Excel but became annoyed with its limitations as I focused more on data analysis.  Somewhere along the line, I was introduced to R, then Python, and the rest is history.  It was an instant nerd crush and I have been expanding my data programming skills since.  This blog is my valentine to the possibilities of what can be accomplished with data.
+<br></br>
+When not dealing with numbers, I can be found running, biking, and enjoying a beer on a patio.
+ 
+    </p>
+</div><!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Social -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+  <ul class="list-group" id="social">
+    <li class="list-group-item"><a href="https://github.com/NickyThreeNames"><i class="fa fa-github-square fa-lg"></i> GitHub</a></li>
+    <li class="list-group-item"><a href="https://www.linkedin.com/in/nick-conti-6364475"><i class="fa fa-linkedin-square fa-lg"></i> LinkedIn</a></li>
+    <li class="list-group-item"><a href="https://twitter.com/nickythreenames"><i class="fa fa-twitter-square fa-lg"></i> Twitter</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Social -->
+
+<!-- Sidebar/Tag Cloud -->
+<li class="list-group-item">
+  <a href="/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+  <ul class="list-group list-inline tagcloud" id="tags">
+    <li class="list-group-item tag-4">
+      <a href="/tag/about.html">About</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/api.html">api</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/class.html">Class</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/congress.html">Congress</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/election.html">Election</a>
+    </li>
+    <li class="list-group-item tag-2">
+      <a href="/tag/elections.html">elections</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/fec.html">FEC</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/folium.html">Folium</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/gis.html">GIS</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/machine-learning.html">machine learning</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/map.html">map</a>
+    </li>
+    <li class="list-group-item tag-2">
+      <a href="/tag/mnhouse.html">MNHouse</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/nlp.html">NLP</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/nltk.html">NLTK</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/python.html">python</a>
+    </li>
+    <li class="list-group-item tag-3">
+      <a href="/tag/r.html">R</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/review.html">Review</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/targeting.html">Targeting</a>
+    </li>
+    <li class="list-group-item tag-1">
+      <a href="/tag/tutorial.html">Tutorial</a>
+    </li>
+    <li class="list-group-item tag-4">
+      <a href="/tag/wordcloud.html">wordcloud</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Tag Cloud -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://getpelican.com" target="_blank">Pelican</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://fivethirtyeight.com" target="_blank">FiveThirtyEight</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://realpython.com" target="_blank">RealPython</a>
+    </li>
+    <li class="list-group-item">
+      <a href="https://www.yhat.com" target="_blank">Yhat</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://www.r-bloggers.com" target="_blank">R-bloggers</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container-fluid">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Nick Conti
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'politinerd'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+
+</body>
+</html>
