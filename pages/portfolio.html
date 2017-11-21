@@ -80,8 +80,14 @@ PolitiNerd            </a>
         <h1 class="entry-title">Portfolio</h1>
         
         <div class="entry-content">
-            <h3>Overview</h3>
+            <h2>Overview</h2>
 <p>Curious about a project I've written about in the past?  I will be updating the descriptions here and including links.  My goal is to have a post for all of the listed projects once they are completed.</p>
+<h3>Dashboard for Targeting Competitive House Races in Minnesota</h3>
+<p>I wanted to build a tool I wish I had  when I  was a State Data Manager - an interactive dashboard to sort out the data about what will be the most competitive races. While interactive data tools such as Tableau have become more common, the high cost (both monetary and technical) are still a huge barrier to many organizations. I built this dashboard using only open source tools including javascript, d3.js, dc.js, and HTML.</p>
+<p>It is currently a single-page app, and I plan on integrating it into a Flask or Django app. The live version of the dashboard is <a href="https://targeting.updog.co/">here</a> </p>
+<p><img alt="mninteractive" src="/images/TargetingDashboard2.png"></p>
+<h3>Statistical Modeling of Voter Behavior</h3>
+<p>After taking the Persuasion Analytics and Targeting class from Ken Strasma (full review <a href="http://www.nickconti.io/persuasion_analytics.html">here</a>), I continued working on predictive voter  modeling. The focus has been on trying new algorithms and data preparation pipelines to model partisanship and candidate preference. My language of choice has been Python and you can see the details of the work so far in the following blog posts focused on <a href="http://www.nickconti.io/partisan_model.html">partisanship modeling</a> and <a href="http://www.nickconti.io/candidate_models.html">candidate support models</a>. I am continuing to try new approaches and will publish my work on voter turnout modeling soon.</p>
 <h3>Election Results Mapping</h3>
 <p>There's got to be a better way to display election data on maps, right?  There is a post on the blog (and another is on the way) that goes more in depth.  Additionally, you can take a look at this github <a href="https://github.com/NickyThreeNames/ElectionStatsandMap">repo</a>.  As part of this effort, I have been trying to move away from static pictures and create more interactivity.</p>
 <p>Interactive version available <a href="http://bl.ocks.org/NickyThreeNames/e3228a8ea478b78c802bb12ac94e3d8c">here</a></p>
@@ -93,8 +99,6 @@ PolitiNerd            </a>
 <h3>Flask and D3 Powered Web App</h3>
 <p>While working on some of the above projects, I became more interested on how to host some basic applications online.   I found this <a href="https://realpython.com/blog/python/web-development-with-flask-fetching-data-with-requests/#deploying">tutorial</a> at <a href="https://realpython.com/">Real Python</a> and decided to give it a try.  The app creates a bubble chart with D3.js based on stock prices and volume.  This was great tutorial, but I had some trouble deploying the app until I switched to Heroku for hosting.  Live version is <a href="http://stocksncm.herokuapp.com/">here</a> and  Github repo is <a href="https://github.com/NickyThreeNames/stocksD3">here</a>.</p>
 <p><img alt="stockviz" src="/images/StockViz1.PNG"></p>
-<h3>Targeting Dashboard</h3>
-<p>Despite spending years of my life trying to make sense of gargantuan spreadsheets full of district statistics, I always thought there had to be a better way to target competitive districts.  Then I stumbled into <a href="http://square.github.io/crossfilter/">Crossfilter</a> and <a href="https://dc-js.github.io/dc.js/">dc.js</a> and was really impressed.  I had tried some basic projects but was really inspired to work off of an example I saw <a href="https://austinlyons.github.io/dcjs-leaflet-untappd/#">here</a>.  This <a href="https://github.com/NickyThreeNames/targetingDashboard">repo</a> has my ongoing work to get an interactive targeting dashboard up and running with data from 2014.</p>
         </div>
     </section>
         </div>
